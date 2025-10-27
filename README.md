@@ -319,23 +319,11 @@ black .
 
 ## Roadmap
 
-### V0.1 (Current) - MVP
+### V0.1 (Current) 
 - ✅ CLI with `init`, `update`, `validate`, `list` commands
 - ✅ Auto-discovery of instruction files
 - ✅ Context-aware updates (language, framework detection)
 - ✅ Basic validation
-
-### V0.2 (Next)
-- [ ] Template library with common behaviors
-- [ ] `sync` command for applying templates
-- [ ] Diff preview before applying changes
-- [ ] Config file generation
-
-### V0.3 (Future)
-- [ ] MCP server for AI self-update capability
-- [ ] Advanced consistency checking
-- [ ] CI/CD integration examples
-- [ ] Community template marketplace
 
 ---
 
@@ -362,9 +350,7 @@ Perfect for giving your AI assistants the essential context they need, once, and
 ## Links
 
 - **GitHub**: [https://github.com/Nas4146/brief](https://github.com/Nas4146/brief)
-- **PyPI**: [https://pypi.org/project/ai-brief](https://pypi.org/project/ai-brief) *(coming soon)*
 - **Issues**: [https://github.com/Nas4146/brief/issues](https://github.com/Nas4146/brief/issues)
 
 ---
 
-Made with ❤️ for developers who believe in consistent AI assistance across tools.
