@@ -255,8 +255,18 @@ def update(instruction: str, project_dir: str, preview: bool, yes: bool):
     default=".",
     help="Project directory (default: current directory)",
 )
-def validate(project_dir: str):
-    """Validate instruction files for consistency."""
+@click.option(
+    "--check-latest",
+    is_flag=True,
+    help="Check if the most recent update was added to all files",
+)
+@click.option(
+    "--check-all/--no-check-all",
+    default=True,
+    help="Check if all core instructions exist across files (default: enabled)",
+)
+def validate(project_dir: str, check_latest: bool, check_all: bool):
+    """Validate instruction files for consistency across all agent files."""
     project_path = Path(project_dir).resolve()
     
     console.print(Panel.fit(
@@ -270,21 +280,49 @@ def validate(project_dir: str):
         console.print("[yellow]⚠️  No instruction files found[/yellow]")
         sys.exit(1)
     
+    if len(files) < 2:
+        console.print("[yellow]ℹ️  Only one instruction file found - nothing to compare[/yellow]")
+        console.print(Panel.fit(
+            "[bold green]✅ Single file is valid![/bold green]",
+            border_style="green"
+        ))
+        sys.exit(0)
+    
     console.print(f"\n[bold]📋 Checking {len(files)} file(s)...[/bold]\n")
+    
+    # Run validation
+    all_valid, issues = validate_instructions(files, project_path, check_latest, check_all)
     
     # Create validation table
     validation_table = Table(box=box.SIMPLE, show_header=True, header_style="bold cyan")
     validation_table.add_column("File", style="white")
-    validation_table.add_column("Status", style="green", justify="center")
+    validation_table.add_column("Status", justify="center")
+    
+    # Track which files have issues
+    file_issues = {}
+    for issue in issues:
+        # Parse file name from issue string
+        for file in files:
+            if file.name in issue:
+                if file not in file_issues:
+                    file_issues[file] = []
+                file_issues[file].append(issue)
     
     for file in files:
         rel_path = file.relative_to(project_path)
-        validation_table.add_row(str(rel_path), "✓")
+        if file in file_issues:
+            validation_table.add_row(str(rel_path), "[red]✗[/red]")
+        else:
+            validation_table.add_row(str(rel_path), "[green]✓[/green]")
     
     console.print(validation_table)
     
-    # TODO: Implement validation logic
-    all_valid = True
+    # Display issues if any
+    if issues:
+        console.print(f"\n[bold red]⚠️  Found {len(issues)} issue(s):[/bold red]\n")
+        for issue in issues:
+            console.print(f"  [red]•[/red] {issue}")
+        console.print()
     
     if all_valid:
         console.print(Panel.fit(

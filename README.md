@@ -63,6 +63,19 @@ pip install -e '.[mcp]'       # CLI + MCP
 - Just want the CLI? → `pip install ai-brief`
 - Want AI assistants to use Brief? → `pip install 'ai-brief[mcp]'`
 
+### Verify Installation
+
+```bash
+# Check CLI is installed
+brief --version
+# Output: brief, version 0.1.0
+
+# Check MCP server (if installed with [mcp])
+which brief-mcp
+# Output: /path/to/brief-mcp (if installed)
+#         brief-mcp not found (if not installed)
+```
+
 ---
 
 ## Quick Start
@@ -202,14 +215,47 @@ brief update "Run tests before committing any code"
 
 ### `brief validate`
 
-Check instruction files for consistency and issues.
+Check instruction files for consistency across all agent files.
+
+**Two validation modes:**
+
+1. **`--check-all`** (default): Verifies that core instructions/guidance exists across all files
+   - Checks if topics mentioned in one file are covered in others
+   - Uses fuzzy matching - doesn't require word-for-word matches
+   - Helps ensure no agent is missing important guidance
+
+2. **`--check-latest`**: Verifies the most recent update was added to all files
+   - Finds the most recently modified file
+   - Checks if similar content exists in other files
+   - Useful after running `brief update` to verify changes propagated
 
 ```bash
+# Check overall consistency (default)
 brief validate
 
-# Output:
+# Check only if latest update is in all files
+brief validate --check-latest --no-check-all
+
+# Check both
+brief validate --check-latest
+
+# Output with issues:
 # 🔍 Validating instructions in: your-project
 # 📋 Checking 3 file(s)...
+# 
+#   File                              Status
+#   ────────────────────────────────────────
+#   AGENTS.md                           ✗
+#   CLAUDE.md                           ✓
+#   .github/copilot-instructions.md     ✗
+#
+# ⚠️  Found 2 issue(s):
+#   • Recent update in 'CLAUDE.md' may be missing from: AGENTS.md
+#   • 'copilot-instructions.md' may be missing guidance on: testing, error handling
+#
+# ❌ Found inconsistencies
+
+# Output when consistent:
 # ✅ All instruction files are consistent!
 ```
 
@@ -318,11 +364,27 @@ black .
 
 ## Roadmap
 
-### V0.1 (Current) 
+### V0.1 (Current) - MVP ✅ Complete
 - ✅ CLI with `init`, `update`, `validate`, `list` commands
 - ✅ Auto-discovery of instruction files
 - ✅ Context-aware updates (language, framework detection)
 - ✅ Basic validation
+- ✅ Diff preview before applying changes
+- ✅ MCP server for AI assistant integration
+- ✅ Duplicate prevention with fuzzy matching
+
+### V0.2 (Next)
+- [ ] Template library with common behaviors
+- [ ] `sync` command for applying templates
+- [ ] Config file generation wizard
+- [ ] Advanced consistency checking
+- [ ] CI/CD integration examples
+
+### V0.3 (Future)
+- [ ] Community template marketplace
+- [ ] Web dashboard for team management
+- [ ] Git hooks integration
+- [ ] Multi-project synchronization
 
 ---
 
